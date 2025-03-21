@@ -3,10 +3,10 @@ from typing import Callable
 import survey
 
 
-def display_menu(on_exit: Callable[[], None]=None) -> None:
+def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     menu_options = (
         'Temp',
-        'Exit'
+        'Back'
     )
 
     menu_index = survey.routines.select('Prediction:', options=menu_options)
@@ -14,3 +14,7 @@ def display_menu(on_exit: Callable[[], None]=None) -> None:
     match menu_index:
         case _:
             on_exit()
+
+
+if __name__ == '__main__':
+    display_menu()

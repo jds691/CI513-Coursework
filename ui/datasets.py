@@ -5,11 +5,14 @@ import survey
 
 def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     menu_options = (
-        'Temp',
+        'Energy - Demand',
+        'Weather - Demand',
+        'Energy - Supply',
+        'Weather - Supply',
         'Back'
     )
 
-    menu_index = survey.routines.select('Optimisation:', options=menu_options)
+    menu_index = survey.routines.select('Visualise Dataset:', options=menu_options)
 
     match menu_index:
         case _:
