@@ -84,6 +84,15 @@ class EnergyDataset(Dataset):
                     daily_avg_plot.set_title('Average Daily PV load in 2021')
 
                     plt.show()
+                case EnergyDataset.Visualisations.LOW_POWER:
+                    # Filter days when the average PV supply is less than 50 MW
+                    low_supply_days = self.dataset[self.dataset['MW_Daily_AVG'] < 50]
+
+                    low_power_plot = sns.barplot(data=low_supply_days, x='Date', y='MW_Daily_AVG')
+                    low_power_plot.set(xlabel='Date', ylabel='Average MW')
+                    low_power_plot.set_title('Low Power PV Load in 2021 (< 50 MW)')
+
+                    plt.show()
                 case _:
                     print(f'Unknown visualisation: \'{figure}\'')
 
@@ -95,9 +104,17 @@ class EnergyDataset(Dataset):
 if __name__ == '__main__':
     energy_demand: EnergyDataset = EnergyDataset('data/Sakakah 2021 Demand dataset.xlsx')
     energy_demand.clean()
+    energy_demand.visualise([
+        EnergyDataset.Visualisations.HEAD,
+        EnergyDataset.Visualisations.AVG_LOAD
+    ])
 
     energy_supply: EnergyDataset = EnergyDataset('data/Sakakah 2021 PV Supply dataset.xlsx', datetime_column='Date & Time')
     energy_supply.clean()
+    energy_supply.visualise([
+        EnergyDataset.Visualisations.HEAD,
+        EnergyDataset.Visualisations.LOW_POWER
+    ])
 
     weather_demand: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset Demand.csv')
     weather_demand.clean()
