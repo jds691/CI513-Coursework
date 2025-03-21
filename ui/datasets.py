@@ -2,6 +2,18 @@ from typing import Callable
 
 import survey
 
+from dataset import EnergyDataset
+
+
+def _visualise_energy_demand() -> None:
+    dataset: EnergyDataset = EnergyDataset('data/Sakakah 2021 Demand dataset.xlsx')
+    dataset.clean()
+    dataset.visualise('all')
+
+def _visualise_energy_supply() -> None:
+    dataset: EnergyDataset = EnergyDataset('data/Sakakah 2021 PV Supply dataset.xlsx', datetime_column='Date & Time')
+    dataset.clean()
+    dataset.visualise('all')
 
 def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     menu_options = (
@@ -15,6 +27,12 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     menu_index = survey.routines.select('Visualise Dataset:', options=menu_options)
 
     match menu_index:
+        case 0:
+            _visualise_energy_demand()
+            display_menu(on_exit=on_exit)
+        case 2:
+            _visualise_energy_supply()
+            display_menu(on_exit=on_exit)
         case _:
             on_exit()
 
