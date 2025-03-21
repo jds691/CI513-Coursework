@@ -4,11 +4,13 @@ import survey
 
 from dataset import EnergyDataset, WeatherDataset
 
-
 def _visualise_energy_demand() -> None:
     dataset: EnergyDataset = EnergyDataset('data/Sakakah 2021 Demand dataset.xlsx')
     dataset.clean()
-    dataset.visualise('all')
+    dataset.visualise([
+        EnergyDataset.Visualisations.HEAD,
+        EnergyDataset.Visualisations.AVG_LOAD
+    ])
 
 def _visualise_weather_demand() -> None:
     dataset: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset Demand.csv')
@@ -18,7 +20,10 @@ def _visualise_weather_demand() -> None:
 def _visualise_energy_supply() -> None:
     dataset: EnergyDataset = EnergyDataset('data/Sakakah 2021 PV Supply dataset.xlsx', datetime_column='Date & Time')
     dataset.clean()
-    dataset.visualise('all')
+    dataset.visualise([
+        EnergyDataset.Visualisations.HEAD,
+        EnergyDataset.Visualisations.LOW_POWER
+    ])
 
 def _visualise_weather_supply() -> None:
     dataset: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset.xlsx')
