@@ -1,3 +1,5 @@
+from enum import StrEnum, auto
+
 import pandas as pd
 from pandas import DataFrame
 import matplotlib.pyplot as plt
@@ -48,6 +50,9 @@ class EnergyDataset(Dataset):
         self.dataset.rename(columns={datetime_column: 'DATE-TIME'}, inplace=True)
 
     def clean(self) -> None:
+        # Force MW to be a numeric value
+        self.dataset['MW'] = pd.to_numeric(self.dataset['MW'], errors='coerce')
+
         # Convert DateTime values to Pandas DataTime values
         self.dataset['DATE-TIME'] = pd.to_datetime(self.dataset['DATE-TIME'])
 
@@ -58,15 +63,34 @@ class EnergyDataset(Dataset):
         daily_avg = self.dataset.groupby('Date')['MW'].mean().reset_index()
         self.dataset = pd.merge(self.dataset, daily_avg, on='Date', suffixes=('', '_Daily_AVG'))
 
+        # TODO: Replace missing data with average for that weekly day
+
     def visualise(self, figures=str | list[str]) -> None:
-        print(self.dataset.head())
+        if isinstance(figures, str):
+            if figures == 'all':
+                # TODO
+                pass
+            else:
+                figures = [figures]
 
-        # Plot the daily average
-        daily_avg_plot = sns.lineplot(x='Date', y='MW', data=self.dataset)
-        daily_avg_plot.set(xlabel='Date', ylabel='Average MW')
-        daily_avg_plot.set_title('Average Daily PV load in 2021')
+        for figure in figures:
+            match figure:
+                case EnergyDataset.Visualisations.HEAD:
+                    print(self.dataset.head())
+                case EnergyDataset.Visualisations.AVG_LOAD:
+                    # Plot daily average load
+                    daily_avg_plot = sns.lineplot(x='Date', y='MW', data=self.dataset)
+                    daily_avg_plot.set(xlabel='Date', ylabel='Average MW')
+                    daily_avg_plot.set_title('Average Daily PV load in 2021')
 
-        plt.show()
+                    plt.show()
+                case _:
+                    print(f'Unknown visualisation: \'{figure}\'')
+
+    class Visualisations(StrEnum):
+        HEAD = auto()
+        AVG_LOAD = auto()
+        LOW_POWER = auto()
 
 if __name__ == '__main__':
     energy_demand: EnergyDataset = EnergyDataset('data/Sakakah 2021 Demand dataset.xlsx')
