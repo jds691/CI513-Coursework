@@ -54,7 +54,11 @@ class PredictionModelRunner:
         # TODO: Implement the main processing in here. This is where the main bulk of the processing and visualisations should be
 
     def _create_model_config(self) -> dict:
-        pass
+        model_config: dict = {
+            PredictionConfigOption.DISABLE_CACHE: self.config[PredictionConfigOption.DISABLE_CACHE]
+        }
+
+        return model_config
 
     def _create_models(self) -> list[PredictionModel]:
         models: list[PredictionModel] = []
