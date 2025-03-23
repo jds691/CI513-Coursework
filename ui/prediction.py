@@ -2,36 +2,38 @@ from typing import Callable
 
 import survey
 
+from models.prediction import PredictionModelRunner, PredictionConfigOption, PredictionProblem, \
+    PredictionModelDisableCache, PredictionModelName
 
 def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     available_prediction_models = [
-        'Decision Tree Regression'
+        PredictionModelName.DECISION_TREE,
     ]
     model_selection_widget = survey.widgets.Basket(options=available_prediction_models)
 
     available_problems = [
-        'Supply',
-        'Demand'
+        PredictionProblem.SUPPLY,
+        PredictionProblem.DEMAND
     ]
     problem_selection_widget = survey.widgets.Select(options=available_problems)
 
     disable_cache_options = [
-        'No',
-        'Yes'
+        PredictionModelDisableCache.NO,
+        PredictionModelDisableCache.YES
     ]
     disable_cache_selection_widget = survey.widgets.Select(options=disable_cache_options)
 
     form_options = {
-        'Enabled Models': model_selection_widget,
-        'Problem': problem_selection_widget,
-        'Disable Cache': disable_cache_selection_widget
+        PredictionConfigOption.ENABLED_MODELS : model_selection_widget,
+        PredictionConfigOption.PROBLEM: problem_selection_widget,
+        PredictionConfigOption.DISABLE_CACHE: disable_cache_selection_widget
     }
 
     prediction_config_data: dict = survey.routines.form('Prediction:', form=form_options)
 
     if survey.routines.inquire('Run prediction with the above settings?', default=True):
-        # TODO: Run with config settings
-        pass
+        PredictionModelRunner(prediction_config_data).run_models()
+        on_exit()
     elif survey.routines.inquire('Return to main menu?', default=True):
         on_exit()
     else:
