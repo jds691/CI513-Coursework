@@ -63,7 +63,26 @@ class EnergyDataset(Dataset):
         daily_avg = self.dataset.groupby('Date')['MW'].mean().reset_index()
         self.dataset = pd.merge(self.dataset, daily_avg, on='Date', suffixes=('', '_Daily_AVG'))
 
-        # TODO: Replace missing data with average for that weekly day
+        self.dataset['Missing_MW'] = self.dataset['MW'].isna() | (self.dataset['MW'] == 0)
+        self.dataset['Weekday'] = self.dataset['DATE-TIME'].dt.dayofweek  # Monday=0, Sunday=6
+        self.dataset['Hour'] = self.dataset['DATE-TIME'].dt.hour
+
+        # Calculate the average MW for each hour of each day of the week
+        hourly_avg = self.dataset.groupby(['Weekday', 'Hour'])['MW'].mean()
+
+        # Function to fill missing values with the hourly average for that specific day of the week and hour
+        def fill_missing(row):
+            if row['Missing_MW']:
+                # Get the corresponding average for that day of the week and hour
+                return hourly_avg.loc[row['Weekday'], row['Hour']]
+            else:
+                return row['MW']
+
+        # Apply the function to fill missing values
+        self.dataset['MW'] = self.dataset.apply(fill_missing, axis=1)
+
+        # Drop the auxiliary columns used for calculation
+        self.dataset = self.dataset.drop(columns=['Missing_MW', 'Weekday', 'Hour'])
 
     def visualise(self, figures=str | list[str]) -> None:
         if isinstance(figures, str):
