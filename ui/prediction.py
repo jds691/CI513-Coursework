@@ -6,21 +6,22 @@ from models.prediction import PredictionModelRunner, PredictionConfigOption, Pre
     PredictionModelDisableCache, PredictionModelName
 
 def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
-    available_prediction_models = [
-        PredictionModelName.DECISION_TREE,
-    ]
+    available_prediction_models = []
+    for name in PredictionModelName:
+        available_prediction_models.append(name.value)
+
     model_selection_widget = survey.widgets.Basket(options=available_prediction_models)
 
-    available_problems = [
-        PredictionProblem.SUPPLY,
-        PredictionProblem.DEMAND
-    ]
+    available_problems = []
+    for name in PredictionProblem:
+        available_problems.append(name.value)
+
     problem_selection_widget = survey.widgets.Select(options=available_problems)
 
-    disable_cache_options = [
-        PredictionModelDisableCache.NO,
-        PredictionModelDisableCache.YES
-    ]
+    disable_cache_options = []
+    for option in PredictionModelDisableCache:
+        disable_cache_options.append(option.value)
+
     disable_cache_selection_widget = survey.widgets.Select(options=disable_cache_options)
 
     form_options = {
