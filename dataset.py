@@ -98,23 +98,22 @@ class EnergyDataset(Dataset):
     def visualise(self, figures=str | list[str]) -> None:
         if isinstance(figures, str):
             if figures == 'all':
-                # TODO
-                pass
+                figures = list(map(lambda enum: enum.value, self.Visualisations))
             else:
                 figures = [figures]
 
         for figure in figures:
             match figure:
-                case EnergyDataset.Visualisations.HEAD:
+                case self.Visualisations.HEAD:
                     print(self.dataset.head())
-                case EnergyDataset.Visualisations.AVG_LOAD:
+                case self.Visualisations.AVG_LOAD:
                     # Plot daily average load
                     daily_avg_plot = sns.lineplot(x='Date', y='MW', data=self.dataset)
                     daily_avg_plot.set(xlabel='Date', ylabel='Average MW')
                     daily_avg_plot.set_title('Average Daily PV load in 2021')
 
                     plt.show()
-                case EnergyDataset.Visualisations.LOW_POWER:
+                case self.Visualisations.LOW_POWER:
                     # Filter days when the average PV supply is less than 50 MW
                     low_supply_days = self.dataset[self.dataset['MW_Daily_AVG'] < 50]
 
@@ -211,14 +210,13 @@ class MergedDataset(Dataset):
     def visualise(self, figures=str | list[str]) -> None:
         if isinstance(figures, str):
             if figures == 'all':
-                # TODO
-                pass
+                figures = list(map(lambda enum: enum.value, self.Visualisations))
             else:
                 figures = [figures]
 
         for figure in figures:
             match figure:
-                case MergedDataset.Visualisations.HEAD:
+                case self.Visualisations.HEAD:
                     # Display the first few rows to verify the new features
                     print("Dataset with new features:")
                     print(self.dataset.head())
@@ -246,10 +244,11 @@ if __name__ == '__main__':
 
     weather_demand: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset Demand.csv')
     weather_demand.clean()
+    weather_demand.visualise('all')
 
     weather_supply: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset.csv')
     weather_supply.clean()
-
+    weather_supply.visualise('all')
 
     merged_supply: MergedDataset = MergedDataset(energy_supply, weather_supply)
     merged_supply.clean()
