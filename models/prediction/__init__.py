@@ -1,7 +1,9 @@
-from enum import StrEnum, auto
+from enum import StrEnum
 from typing import Any
 
 from sklearn.tree import DecisionTreeClassifier
+
+from dataset import WeatherDataset, EnergyDataset, MergedDataset
 
 
 class PredictionModelName(StrEnum):
@@ -50,6 +52,14 @@ class PredictionModelRunner:
 
     def run_models(self) -> None:
         models: list[PredictionModel] = self._create_models()
+
+        # Adding final dataset features
+
+        weather_dataset = WeatherDataset('data/Sakakah 2021 weather dataset.csv' if self.config[PredictionConfigOption.PROBLEM] == PredictionProblem.SUPPLY else 'data/Sakakah 2021 weather dataset Demand.csv')
+        energy_dataset = EnergyDataset('data/Sakakah 2021 PV Supply dataset.xlsx' if self.config[PredictionConfigOption.PROBLEM] == PredictionProblem.SUPPLY else 'data/Sakakah 2021 Demand dataset.xlsx', datetime_column='Date & Time' if self.config[PredictionConfigOption.PROBLEM] == PredictionProblem.SUPPLY else 'DATE-TIME')
+
+        merged_dataset = MergedDataset(energy_dataset, weather_dataset)
+        merged_dataset.clean()
 
         # TODO: Implement the main processing in here. This is where the main bulk of the processing and visualisations should be
 
