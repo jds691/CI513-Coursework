@@ -140,6 +140,9 @@ class MergedDataset(Dataset):
         self.dataset = pd.merge(energy_dataset.dataset, weather_dataset.dataset, on='DATE-TIME', how='left')
 
     def clean(self) -> None:
+        if self.is_cleaned:
+            return
+
         # Extract time-based features
         self.dataset['Month'] = self.dataset['DATE-TIME'].dt.month
         self.dataset['Day'] = self.dataset['DATE-TIME'].dt.day
@@ -206,6 +209,8 @@ class MergedDataset(Dataset):
 
         # Fill any resulting NaN values (especially for lagged and rolling features)
         self.dataset.fillna(0, inplace=True)
+
+        self.is_cleaned = True
 
     def visualise(self, figures=str | list[str]) -> None:
         if isinstance(figures, str):
