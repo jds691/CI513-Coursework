@@ -219,17 +219,40 @@ class MergedDataset(Dataset):
             else:
                 figures = [figures]
 
+        numeric_cols = self.dataset.select_dtypes(include=[np.number])
+
         for figure in figures:
             match figure:
                 case self.Visualisations.HEAD:
                     # Display the first few rows to verify the new features
                     print("Dataset with new features:")
                     print(self.dataset.head())
+                case self.Visualisations.NUMERIC_CORRELATION:
+                    correlation = numeric_cols.corr()
+                    sns.heatmap(correlation, annot=True, fmt=".2f")
+                case self.Visualisations.FEATURE_DISTRIBUTION:
+                    # Plotting box plots
+                    sns.boxplot(numeric_cols)
+                    plt.title('Boxplot for Numeric Features to Detect Outliers')
+                    plt.xticks(rotation=90)
+                    plt.show()
+
+                    # Plot histograms for all numeric features
+                    numeric_cols.hist()
+                    plt.suptitle('Histograms of Numeric Features')
+                    plt.show()
+                case self.Visualisations.TARGET_DISTRIBUTION:
+                    sns.histplot(self.dataset['MW'], kde=True)
+                    plt.title('Distribution of Target Variable (MW)')
+                    plt.show()
                 case _:
                     print(f'Unknown visualisation: \'{figure}\'')
 
     class Visualisations(StrEnum):
         HEAD = auto()
+        NUMERIC_CORRELATION = auto()
+        FEATURE_DISTRIBUTION = auto()
+        TARGET_DISTRIBUTION = auto()
 
 
 if __name__ == '__main__':
