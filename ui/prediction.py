@@ -3,7 +3,8 @@ from typing import Callable
 import survey
 
 from models.prediction import PredictionModelRunner, PredictionConfigOption, PredictionProblem, \
-    PredictionModelDisableCache, PredictionModelName
+    PredictionModelDisableCache, PredictionModelName, PredictionFeatureSets
+
 
 def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     available_prediction_models = []
@@ -24,10 +25,17 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
 
     disable_cache_selection_widget = survey.widgets.Select(options=disable_cache_options)
 
+    available_feature_sets = []
+    for feature_set in PredictionFeatureSets:
+        available_feature_sets.append(feature_set.value)
+
+    feature_sets_selection_widget = survey.widgets.Basket(options=available_feature_sets)
+
     form_options = {
         PredictionConfigOption.ENABLED_MODELS : model_selection_widget,
         PredictionConfigOption.PROBLEM: problem_selection_widget,
-        PredictionConfigOption.DISABLE_CACHE: disable_cache_selection_widget
+        PredictionConfigOption.DISABLE_CACHE: disable_cache_selection_widget,
+        PredictionConfigOption.FEATURE_SETS: feature_sets_selection_widget
     }
 
     prediction_config_data: dict = survey.routines.form('Prediction:', form=form_options)
