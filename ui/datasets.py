@@ -35,14 +35,14 @@ def _visualise_energy_supply() -> None:
     ])
 
 def _visualise_weather_supply() -> None:
-    dataset: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset.xlsx')
+    dataset: WeatherDataset = WeatherDataset('data/Sakakah 2021 weather dataset.csv')
     dataset.clean()
     dataset.visualise('all')
 
 def _visualise_merged_supply() -> None:
     dataset: MergedDataset = MergedDataset(
         EnergyDataset('data/Sakakah 2021 PV Supply dataset.xlsx', datetime_column='Date & Time'),
-        WeatherDataset('data/Sakakah 2021 weather dataset.xlsx')
+        WeatherDataset('data/Sakakah 2021 weather dataset.csv')
     )
     dataset.clean()
     dataset.visualise('all')
