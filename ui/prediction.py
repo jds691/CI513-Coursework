@@ -40,6 +40,16 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
 
     prediction_config_data: dict = survey.routines.form('Prediction:', form=form_options)
 
+    model_names = map(lambda model_index: available_prediction_models[model_index], prediction_config_data[PredictionConfigOption.ENABLED_MODELS])
+    prediction_config_data[PredictionConfigOption.ENABLED_MODELS] = list(model_names)
+
+    prediction_config_data[PredictionConfigOption.PROBLEM] = available_problems[prediction_config_data[PredictionConfigOption.PROBLEM]]
+    prediction_config_data[PredictionConfigOption.DISABLE_CACHE] = disable_cache_options[prediction_config_data[PredictionConfigOption.DISABLE_CACHE]]
+
+    feature_sets = map(lambda set_index: available_feature_sets[set_index],
+                      prediction_config_data[PredictionConfigOption.FEATURE_SETS])
+    prediction_config_data[PredictionConfigOption.FEATURE_SETS] = list(feature_sets)
+
     if survey.routines.inquire('Run prediction with the above settings?', default=True):
         PredictionModelRunner(prediction_config_data).run_models()
         on_exit()
