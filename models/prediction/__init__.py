@@ -144,21 +144,6 @@ class PredictionModelRunner:
                         rmse = np.sqrt(mse)
                         r2 = r2_score(y_test, y_predicted)
 
-                        # Store the result
-                        results.append({
-                            'Year': year,
-                            'Month': calendar.month_name[month],
-                            'Feature Set': feature_set,
-                            'MSE': mse,
-                            'MAE': mae,
-                            'RMSE': rmse,
-                            'R2': r2,
-                            'Model': model_name,
-                        })
-
-                        print(f"Completed {feature_set} on model {model_name} for {calendar.month_name[month]} {year} with "
-                              f"MSE: {mse}, MAE: {mae}, RMSE: {rmse}, R-squared: {r2}")
-
                         # Inverse transform to get back to original scale
                         placeholder = np.zeros((y_test.shape[0], X_train.shape[1]))
                         placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
@@ -167,15 +152,31 @@ class PredictionModelRunner:
                         placeholder[:, 0] = y_predicted.ravel()
                         y_pred_original = scaler.inverse_transform(placeholder)[:, 0]
 
-                        # Collect data for plotting
-                        #monthly_true_values.append((test_by_days['DATE-TIME'][n_steps:], y_test_original))
-                        #monthly_predictions.append((test_by_days['DATE-TIME'][n_steps:], y_pred_original))
-                        monthly_true_values.append((test_by_days['DATE-TIME'], y_test_original))
-                        monthly_predictions.append((test_by_days['DATE-TIME'], y_pred_original))
+                        # Store the results
+                        results.append({
+                            'Model': model_name,
 
-        self._create_visualisations_from_results()
+                            # Statistics
+                            'Year': year,
+                            'Month': calendar.month_name[month],
+                            'Feature Set': feature_set,
+                            'MSE': mse,
+                            'MAE': mae,
+                            'RMSE': rmse,
+                            'R2': r2,
 
-    def _create_visualisations_from_results(self) -> None:
+                            # Monthly data
+                            'Y_test_original': y_test_original,
+                            'Y_pred_original': y_pred_original
+                        })
+
+                        print(
+                            f"Completed {feature_set} on model {model_name} for {calendar.month_name[month]} {year} with "
+                            f"MSE: {mse}, MAE: {mae}, RMSE: {rmse}, R-squared: {r2}")
+
+        self._create_visualisations_from_results(results)
+
+    def _create_visualisations_from_results(self, results) -> None:
         pass
 
     def _create_model_config(self) -> dict:
