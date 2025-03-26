@@ -144,6 +144,7 @@ class MergedDataset(Dataset):
             return
 
         # Extract time-based features
+        self.dataset['Year'] = self.dataset['DATE-TIME'].dt.year
         self.dataset['Month'] = self.dataset['DATE-TIME'].dt.month
         self.dataset['Day'] = self.dataset['DATE-TIME'].dt.day
         self.dataset['Hour'] = self.dataset['DATE-TIME'].dt.hour
