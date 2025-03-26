@@ -230,6 +230,7 @@ class MergedDataset(Dataset):
                 case self.Visualisations.NUMERIC_CORRELATION:
                     correlation = numeric_cols.corr()
                     sns.heatmap(correlation, annot=True, fmt=".2f")
+                    plt.show()
                 case self.Visualisations.FEATURE_DISTRIBUTION:
                     # Plotting box plots
                     sns.boxplot(numeric_cols)
