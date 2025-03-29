@@ -117,7 +117,7 @@ class PredictionModelRunner:
                         #test_scaled = scaler.transform(test_by_days[features])
 
                         X_train = scaler.fit_transform(X_train)
-                        X_test = scaler.fit_transform(X_test)
+                        X_test = scaler.transform(X_test)
 
                         # If 3D inputs are required e.g. LSTM
                         #X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))  # Add third dimension
@@ -145,12 +145,12 @@ class PredictionModelRunner:
                         r2 = r2_score(y_test, y_predicted)
 
                         # Inverse transform to get back to original scale
-                        placeholder = np.zeros((y_test.shape[0], X_train.shape[1]))
-                        placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
-                        y_test_original = scaler.inverse_transform(placeholder)[:, 0]
+                        #placeholder = np.zeros((y_test.shape[0], X_train.shape[1]))
+                        #placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
+                        #y_test_original = scaler.inverse_transform(placeholder)[:, 0]
 
-                        placeholder[:, 0] = y_predicted.ravel()
-                        y_pred_original = scaler.inverse_transform(placeholder)[:, 0]
+                        #placeholder[:, 0] = y_predicted.ravel()
+                        #y_pred_original = scaler.inverse_transform(placeholder)[:, 0]
 
                         # Store the results
                         results.append({
@@ -165,9 +165,9 @@ class PredictionModelRunner:
                             'RMSE': rmse,
                             'R2': r2,
 
-                            # Monthly data
-                            'Y_test_original': y_test_original,
-                            'Y_pred_original': y_pred_original
+                            # Monthly data - This is an hourly record of predicted data for the month
+                            'y_test': y_test,
+                            'y_pred': y_predicted
                         })
 
                         print(
