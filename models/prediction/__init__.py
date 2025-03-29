@@ -3,6 +3,7 @@ from enum import StrEnum
 from typing import Any
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
@@ -158,7 +159,7 @@ class PredictionModelRunner:
 
                             # Statistics
                             'Year': year,
-                            'Month': calendar.month_name[month],
+                            'Month': month,
                             'Feature Set': feature_set,
                             'MSE': mse,
                             'MAE': mae,
@@ -178,7 +179,55 @@ class PredictionModelRunner:
         self._create_visualisations_from_results(results)
 
     def _create_visualisations_from_results(self, results) -> None:
-        pass
+        df_raw_results = pd.DataFrame(results)
+        df_raw_results
+
+        df_results = pd.DataFrame(columns=[
+            'Model',
+            'Date & Time',
+            'Feature Set',
+            'MSE',
+            'MAE',
+            'RMSE',
+            'R2',
+            'Original',
+            'Predicted'
+        ])
+
+        for row_info in df_raw_results.iterrows():
+            row = row_info[1]
+
+            day = row.iloc[8] # day_cutoff
+            hour = 0
+
+            for y_test, y_pred in zip(row.iloc[9], row.iloc[10]):
+                df_row_results = pd.DataFrame([{
+                    'Model': row.iloc[0],
+                    'Feature Set': row.iloc[3],
+                    'MSE': row.iloc[4],
+                    'MAE': row.iloc[5],
+                    'RMSE': row.iloc[6],
+                    'R2': row.iloc[7],
+                    'Original': y_test,
+                    'Predicted': y_pred,
+
+                    'Year': row.iloc[1],
+                    'Month': row.iloc[2],
+                    'Day': day,
+                    'Hour': hour
+                }])
+
+                df_row_results['Date & Time'] = pd.to_datetime(df_row_results[['Year', 'Month', 'Day', 'Hour']])
+                df_row_results.drop(columns=['Year', 'Month', 'Day', 'Hour'], inplace=True)
+
+                df_results = pd.concat([df_results, df_row_results], ignore_index=True)
+
+                hour += 1
+
+                if hour == 24:
+                    day += 1
+                    hour = 0
+
 
     def _create_model_config(self) -> dict:
         model_config: dict = {
