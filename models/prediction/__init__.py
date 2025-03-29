@@ -165,7 +165,8 @@ class PredictionModelRunner:
                             'RMSE': rmse,
                             'R2': r2,
 
-                            # Monthly data - This is an hourly record of predicted data for the month
+                            # Monthly data - This is an hourly record of predicted data for the month from the day cutoff
+                            'day_cutoff': day_cutoff,
                             'y_test': y_test,
                             'y_pred': y_predicted
                         })
