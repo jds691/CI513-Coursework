@@ -1,15 +1,13 @@
 import survey
 
-import ui.prediction
-import ui.optimisation
+import ui.model_runner
 import ui.datasets
 
 from utils import clear_console
 
 def _display_main_menu() -> None:
     menu_options = (
-        'Prediction',
-        'Optimisation',
+        'Run Models',
         'Visualise Datasets',
         'Exit'
     )
@@ -18,10 +16,8 @@ def _display_main_menu() -> None:
 
     match menu_index:
         case 0:
-            ui.prediction.display_menu(on_exit=_display_main_menu)
+            ui.model_runner.display_menu(on_exit=_display_main_menu)
         case 1:
-            ui.optimisation.display_menu(on_exit=_display_main_menu)
-        case 2:
             ui.datasets.display_menu(on_exit=_display_main_menu)
         case _:
             # Allows for exiting without error
