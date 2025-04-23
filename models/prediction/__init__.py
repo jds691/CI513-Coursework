@@ -4,6 +4,8 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from pandas import DataFrame
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
@@ -156,6 +158,7 @@ class PredictionModelRunner:
                         # Store the results
                         results.append({
                             'Model': model_name,
+                            'Optimiser': 'None',
 
                             # Statistics
                             'Year': year,
@@ -180,10 +183,10 @@ class PredictionModelRunner:
 
     def _create_visualisations_from_results(self, results) -> None:
         df_raw_results = pd.DataFrame(results)
-        df_raw_results
 
         df_results = pd.DataFrame(columns=[
             'Model',
+            'Optimiser',
             'Date & Time',
             'Feature Set',
             'MSE',
@@ -197,22 +200,24 @@ class PredictionModelRunner:
         for row_info in df_raw_results.iterrows():
             row = row_info[1]
 
-            day = row.iloc[8] # day_cutoff
+            day = row.iloc[9] # day_cutoff
             hour = 0
 
-            for y_test, y_pred in zip(row.iloc[9], row.iloc[10]):
+            for y_test, y_pred in zip(row.iloc[10], row.iloc[11]):
                 df_row_results = pd.DataFrame([{
                     'Model': row.iloc[0],
-                    'Feature Set': row.iloc[3],
-                    'MSE': row.iloc[4],
-                    'MAE': row.iloc[5],
-                    'RMSE': row.iloc[6],
-                    'R2': row.iloc[7],
+                    'Optimiser': row.iloc[1],
+
+                    'Feature Set': row.iloc[4],
+                    'MSE': row.iloc[5],
+                    'MAE': row.iloc[6],
+                    'RMSE': row.iloc[7],
+                    'R2': row.iloc[8],
                     'Original': y_test,
                     'Predicted': y_pred,
 
-                    'Year': row.iloc[1],
-                    'Month': row.iloc[2],
+                    'Year': row.iloc[2],
+                    'Month': row.iloc[3],
                     'Day': day,
                     'Hour': hour
                 }])
@@ -228,6 +233,20 @@ class PredictionModelRunner:
                     day += 1
                     hour = 0
 
+        # Begin generating visualisations
+
+        feature_sets = df_results['Feature Set'].unique()
+
+        for feature_set in feature_sets:
+            grid = sns.relplot(
+                data=df_results.loc[df_results['Feature Set'] == feature_set], x='Original', y='Predicted',
+                col='Model', hue='Optimiser', style='Optimiser',
+                kind='scatter'
+            )
+
+            grid.figure.suptitle(f'Original vs Predicted - {feature_set}')
+
+            plt.show()
 
     def _create_model_config(self) -> dict:
         model_config: dict = {
