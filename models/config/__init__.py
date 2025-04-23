@@ -3,6 +3,8 @@ from enum import StrEnum
 
 class PredictionModelName(StrEnum):
     DECISION_TREE = 'Decision Tree'
+    EXTRA_TREE = 'Extra Tree'
+    RANDOM_FOREST = 'Random Forest'
 
 class ConfigOption(StrEnum):
     ENABLED_MODELS = 'Enabled Models'

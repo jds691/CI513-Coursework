@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from dataset import WeatherDataset, EnergyDataset, MergedDataset
 from models.config import ConfigOption, Problem, FeatureSet, PredictionModelName
-from models.prediction import PredictionModel, DecisionTreeModel
+from models.prediction import PredictionModel, RandomForestModel, ExtraTreeModel
 
 
 class ModelRunner:
@@ -201,7 +201,11 @@ class ModelRunner:
     def _create_model(self, model_name: str) -> PredictionModel:
         match model_name:
             case PredictionModelName.DECISION_TREE:
-                return DecisionTreeModel(self._create_model_config())
+                return RandomForestModel(self._create_model_config())
+            case PredictionModelName.EXTRA_TREE:
+                return ExtraTreeModel(self._create_model_config())
+            case PredictionModelName.RANDOM_FOREST:
+                return RandomForestModel(self._create_model_config())
 
         raise Exception(f'No model for name: \'{model_name}\'')
 
