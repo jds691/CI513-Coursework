@@ -1,5 +1,6 @@
 from typing import Any
 
+from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 
 from models.config import ConfigOption, PredictionModelName
@@ -25,6 +26,30 @@ class DecisionTreeModel(PredictionModel):
 
     def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
         self.model = DecisionTreeRegressor().fit(x, y)
+
+    def predict(self, x: Any) -> Any:
+        return self.model.predict(x)
+
+class ExtraTreeModel(PredictionModel):
+
+    def __init__(self, config: dict[str, Any]):
+        super().__init__(PredictionModelName.EXTRA_TREE, config)
+        self.model = ExtraTreesRegressor()
+
+    def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
+        self.model = ExtraTreesRegressor().fit(x, y)
+
+    def predict(self, x: Any) -> Any:
+        return self.model.predict(x)
+
+class RandomForestModel(PredictionModel):
+
+    def __init__(self, config: dict[str, Any]):
+        super().__init__(PredictionModelName.RANDOM_FOREST, config)
+        self.model = RandomForestRegressor()
+
+    def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
+        self.model = RandomForestRegressor().fit(x, y)
 
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
