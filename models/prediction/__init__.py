@@ -53,3 +53,7 @@ class RandomForestModel(PredictionModel):
 
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
+
+class BiLSTMModel(PredictionModel):
+    def __init__(self, config: dict[str, Any]):
+        super().__init__(PredictionModelName.BILSTM, config)

@@ -1,16 +1,16 @@
 import calendar
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from pandas import DataFrame
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
 
 from dataset import WeatherDataset, EnergyDataset, MergedDataset
-from models.config import ConfigOption, Problem, FeatureSet, PredictionModelName
-from models.prediction import PredictionModel, RandomForestModel, ExtraTreeModel
+from models.config import Problem, FeatureSet
+from models.prediction import *
 
 
 class ModelRunner:
@@ -206,6 +206,8 @@ class ModelRunner:
                 return ExtraTreeModel(self._create_model_config())
             case PredictionModelName.RANDOM_FOREST:
                 return RandomForestModel(self._create_model_config())
+            case PredictionModelName.BILSTM:
+                return BiLSTMModel(self._create_model_config())
 
         raise Exception(f'No model for name: \'{model_name}\'')
 
