@@ -19,11 +19,11 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
 
     problem_selection_widget = survey.widgets.Select(options=available_problems)
 
-    disable_cache_options = []
-    for option in RunnerDisableCache:
-        disable_cache_options.append(option.value)
+    #disable_cache_options = []
+    #for option in RunnerDisableCache:
+    #    disable_cache_options.append(option.value)
 
-    disable_cache_selection_widget = survey.widgets.Select(options=disable_cache_options)
+    #disable_cache_selection_widget = survey.widgets.Select(options=disable_cache_options)
 
     available_feature_sets = []
     for feature_set in FeatureSet:
@@ -34,7 +34,7 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     form_options = {
         ConfigOption.ENABLED_MODELS : model_selection_widget,
         ConfigOption.PROBLEM: problem_selection_widget,
-        ConfigOption.DISABLE_CACHE: disable_cache_selection_widget,
+        #ConfigOption.DISABLE_CACHE: disable_cache_selection_widget,
         ConfigOption.FEATURE_SETS: feature_sets_selection_widget
     }
 
@@ -44,7 +44,8 @@ def display_menu(on_exit: Callable[[], None]=lambda: ()) -> None:
     runner_config_data[ConfigOption.ENABLED_MODELS] = list(model_names)
 
     runner_config_data[ConfigOption.PROBLEM] = available_problems[runner_config_data[ConfigOption.PROBLEM]]
-    runner_config_data[ConfigOption.DISABLE_CACHE] = disable_cache_options[runner_config_data[ConfigOption.DISABLE_CACHE]]
+    #runner_config_data[ConfigOption.DISABLE_CACHE] = disable_cache_options[runner_config_data[ConfigOption.DISABLE_CACHE]]
+    runner_config_data[ConfigOption.DISABLE_CACHE] = RunnerDisableCache.YES
 
     feature_sets = map(lambda set_index: available_feature_sets[set_index],
                        runner_config_data[ConfigOption.FEATURE_SETS])
