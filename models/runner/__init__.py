@@ -35,11 +35,6 @@ class ModelRunner:
                 model = self._create_model(model_name)
 
                 for year in dataset['Year'].unique():
-
-                    monthly_predictions = []
-                    monthly_true_values = []
-                    full_year_data = dataset[dataset['Year'] == year].sort_values(by='DATE-TIME')
-
                     for month in dataset['Month'].unique():
                         # Filter data for the current month
                         month_data = dataset[(dataset['Year'] == year) & (dataset['Month'] == month)]
@@ -55,9 +50,6 @@ class ModelRunner:
 
                             train_scaled = scaler.fit_transform(train_by_days[features])
                             test_scaled = scaler.transform(test_by_days[features])
-
-                            #X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))  # Add third dimension
-                            #X_test = X_test.reshape((X_test.shape[0], X_test.shape[1], 1))
 
                             def create_sequences(data, n_steps):
                                 X, y = [], []
@@ -93,12 +85,6 @@ class ModelRunner:
                         mae = mean_absolute_error(y_test, y_predicted)
                         rmse = np.sqrt(mse)
                         r2 = r2_score(y_test, y_predicted)
-
-                        #if model.require_3d_input and hasattr(y_predicted, '__len__'):
-                        #    y_predicted = y_predicted[0]
-
-                        #    if len(y_predicted) > 1:
-                        #        print('[WARN]: y_predicted has more than 1 value. Data loss will occur!')
 
                         if model.require_3d_input:
                             # Inverse transform to get back to original scale
@@ -188,6 +174,7 @@ class ModelRunner:
                     hour = 0
 
         # Begin generating visualisations
+        df_results.to_csv('results.csv')
 
         feature_sets = df_results['Feature Set'].unique()
 
