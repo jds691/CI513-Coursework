@@ -6,6 +6,7 @@ class PredictionModelName(StrEnum):
     EXTRA_TREE = 'Extra Tree'
     RANDOM_FOREST = 'Random Forest'
     BILSTM = 'BiLSTM'
+    LSTM = 'LSTM'
 
 class ConfigOption(StrEnum):
     ENABLED_MODELS = 'Enabled Models'

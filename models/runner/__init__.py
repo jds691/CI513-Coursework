@@ -204,6 +204,8 @@ class ModelRunner:
                 return ExtraTreeModel(self._create_model_config())
             case PredictionModelName.RANDOM_FOREST:
                 return RandomForestModel(self._create_model_config())
+            case PredictionModelName.LSTM:
+                return LSTMModel(self._create_model_config())
             case PredictionModelName.BILSTM:
                 return BiLSTMModel(self._create_model_config())
 
