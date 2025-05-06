@@ -59,6 +59,21 @@ class RandomForestModel(PredictionModel):
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
 
+class LSTMModel(PredictionModel):
+    def __init__(self, config: dict[str, Any]):
+        super().__init__(PredictionModelName.LSTM, config)
+        self.require_3d_input = True
+        self.model = Sequential()
+        self.model.add(LSTM(50, activation='relu'))
+        self.model.add(Dense(1))  # output layer
+        self.model.compile(optimizer='adam', loss='mse')
+
+    def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
+        self.model.fit(x, y, epochs=20, batch_size=32, validation_data=validation_data, verbose=1)
+
+    def predict(self, x: Any) -> Any:
+        return self.model.predict(x)
+
 class BiLSTMModel(PredictionModel):
     def __init__(self, config: dict[str, Any]):
         super().__init__(PredictionModelName.BILSTM, config)
