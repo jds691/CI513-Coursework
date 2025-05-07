@@ -2,6 +2,7 @@ from typing import Any
 
 from keras.src.layers import Bidirectional
 from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
+from sklearn.multioutput import MultiOutputRegressor
 from sklearn.tree import DecisionTreeRegressor
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM
@@ -30,7 +31,7 @@ class DecisionTreeModel(PredictionModel):
         self.model = DecisionTreeRegressor()
 
     def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
-        self.model = DecisionTreeRegressor().fit(x, y)
+        self.model.fit(x, y)
 
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
@@ -42,7 +43,7 @@ class ExtraTreeModel(PredictionModel):
         self.model = ExtraTreesRegressor()
 
     def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
-        self.model = ExtraTreesRegressor().fit(x, y)
+        self.model.fit(x, y)
 
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
@@ -54,15 +55,16 @@ class RandomForestModel(PredictionModel):
         self.model = RandomForestRegressor()
 
     def train(self, x: Any, y: Any, validation_data: tuple = None) -> None:
-        self.model = RandomForestRegressor().fit(x, y)
+        self.model.fit(x, y)
 
     def predict(self, x: Any) -> Any:
         return self.model.predict(x)
 
 class LSTMModel(PredictionModel):
     def __init__(self, config: dict[str, Any]):
-        super().__init__(PredictionModelName.LSTM, config)
         self.require_3d_input = True
+
+        super().__init__(PredictionModelName.LSTM, config)
         self.model = Sequential()
         self.model.add(LSTM(50, activation='relu'))
         self.model.add(Dense(1))  # output layer
@@ -76,8 +78,9 @@ class LSTMModel(PredictionModel):
 
 class BiLSTMModel(PredictionModel):
     def __init__(self, config: dict[str, Any]):
-        super().__init__(PredictionModelName.BILSTM, config)
         self.require_3d_input = True
+
+        super().__init__(PredictionModelName.BILSTM, config)
         self.model = Sequential()
         self.model.add(Bidirectional(LSTM(50, activation='relu')))
         self.model.add(Dense(1))  # output layer
