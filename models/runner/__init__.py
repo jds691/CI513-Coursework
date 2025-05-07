@@ -44,38 +44,25 @@ class ModelRunner:
                         train_by_days = month_data[month_data['Day'] <= day_cutoff]
                         test_by_days = month_data[month_data['Day'] > day_cutoff]
 
-                        if model.require_3d_input:
-                            # Scale the data
-                            scaler = MinMaxScaler()
+                        # Scale the data
+                        scaler = MinMaxScaler()
 
-                            train_scaled = scaler.fit_transform(train_by_days[features])
-                            test_scaled = scaler.transform(test_by_days[features])
+                        train_scaled = scaler.fit_transform(train_by_days[features])
+                        test_scaled = scaler.transform(test_by_days[features])
 
-                            def create_sequences(data, n_steps):
-                                X, y = [], []
-                                for i in range(len(data) - n_steps):
+                        def create_sequences(data, n_steps):
+                            X, y = [], []
+                            for i in range(len(data) - n_steps):
+                                if not model.require_3d_input:
+                                    X.append(data[i:i + n_steps, :].flatten())
+                                else:
                                     X.append(data[i:i + n_steps, :])
-                                    y.append(data[i + n_steps, 0])  # Assuming the first column is the target 'MW'
-                                return np.array(X), np.array(y)
+                                y.append(data[i + n_steps, 0])  # Assuming the first column is the target 'MW'
+                            return np.array(X), np.array(y)
 
-                            n_steps = 24  # 24-hour sequences
-                            X_train, y_train = create_sequences(train_scaled, n_steps)
-                            X_test, y_test = create_sequences(test_scaled, n_steps)
-
-                        else:
-                            X_train = train_by_days[features]
-                            y_train = train_by_days['MW']
-                            y_train = y_train.to_numpy()
-
-                            X_test = test_by_days[features]
-                            y_test = test_by_days['MW']
-                            y_test = y_test.to_numpy()
-
-                            # Scale the data
-                            scaler = MinMaxScaler()
-
-                            X_train = scaler.fit_transform(X_train)
-                            X_test = scaler.transform(X_test)
+                        n_steps = 24  # 24-hour sequences
+                        X_train, y_train = create_sequences(train_scaled, n_steps)
+                        X_test, y_test = create_sequences(test_scaled, n_steps)
 
                         model.train(X_train, y_train, validation_data=(X_test, y_test))
 
@@ -86,14 +73,13 @@ class ModelRunner:
                         rmse = np.sqrt(mse)
                         r2 = r2_score(y_test, y_predicted)
 
-                        if model.require_3d_input:
-                            # Inverse transform to get back to original scale
-                            placeholder = np.zeros((y_test.shape[0], train_scaled.shape[1]))
-                            placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
-                            y_test = scaler.inverse_transform(placeholder)[:, 0]
+                        # Inverse transform to get back to original scale
+                        placeholder = np.zeros((y_test.shape[0], train_scaled.shape[1]))
+                        placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
+                        y_test = scaler.inverse_transform(placeholder)[:, 0]
 
-                            placeholder[:, 0] = y_predicted.ravel()
-                            y_predicted = scaler.inverse_transform(placeholder)[:, 0]
+                        placeholder[:, 0] = y_predicted.ravel()
+                        y_predicted = scaler.inverse_transform(placeholder)[:, 0]
 
                         # Store the results
                         results.append({
@@ -242,7 +228,7 @@ class ModelRunner:
 
 if __name__ == '__main__':
     ModelRunner({
-        ConfigOption.ENABLED_MODELS: ['BiLSTM'],
+        ConfigOption.ENABLED_MODELS: ['Random Forest'],
         ConfigOption.DISABLE_CACHE: True,
         ConfigOption.PROBLEM: 'Supply',
         ConfigOption.FEATURE_SETS: ['Full Feature Set'],
