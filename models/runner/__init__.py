@@ -68,11 +68,6 @@ class ModelRunner:
 
                         y_predicted = model.predict(X_test)
 
-                        mse = mean_squared_error(y_test, y_predicted)
-                        mae = mean_absolute_error(y_test, y_predicted)
-                        rmse = np.sqrt(mse)
-                        r2 = r2_score(y_test, y_predicted)
-
                         # Inverse transform to get back to original scale
                         placeholder = np.zeros((y_test.shape[0], train_scaled.shape[1]))
                         placeholder[:, 0] = y_test.ravel()  # Assuming y_test is the first column after scaling
@@ -90,10 +85,6 @@ class ModelRunner:
                             'Year': year,
                             'Month': month,
                             'Feature Set': feature_set,
-                            'MSE': mse,
-                            'MAE': mae,
-                            'RMSE': rmse,
-                            'R2': r2,
 
                             # Monthly data - This is an hourly record of predicted data for the month from the day cutoff
                             'day_cutoff': day_cutoff,
@@ -101,9 +92,7 @@ class ModelRunner:
                             'y_pred': y_predicted
                         })
 
-                        print(
-                            f"Completed {feature_set} on model {model_name} for {calendar.month_name[month]} {year} with "
-                            f"MSE: {mse}, MAE: {mae}, RMSE: {rmse}, R-squared: {r2}")
+                        print(f"Completed {feature_set} on model {model_name} for {calendar.month_name[month]} {year}")
 
         self._create_visualisations_from_results(results)
 
@@ -115,30 +104,32 @@ class ModelRunner:
             'Optimiser',
             'Date & Time',
             'Feature Set',
+            'Original',
+            'Predicted'
+        ])
+        df_metrics = pd.DataFrame(columns=[
+            'Model',
+            'Optimiser',
+            'Feature Set',
+
             'MSE',
             'MAE',
             'RMSE',
-            'R2',
-            'Original',
-            'Predicted'
+            'R2'
         ])
 
         for row_info in df_raw_results.iterrows():
             row = row_info[1]
 
-            day = row.iloc[9] # day_cutoff
+            day = row.iloc[5] # day_cutoff
             hour = 0
 
-            for y_test, y_pred in zip(row.iloc[10], row.iloc[11]):
+            for y_test, y_pred in zip(row.iloc[6], row.iloc[7]):
                 df_row_results = pd.DataFrame([{
                     'Model': row.iloc[0],
                     'Optimiser': row.iloc[1],
 
                     'Feature Set': row.iloc[4],
-                    'MSE': row.iloc[5],
-                    'MAE': row.iloc[6],
-                    'RMSE': row.iloc[7],
-                    'R2': row.iloc[8],
                     'Original': y_test,
                     'Predicted': y_pred,
 
@@ -159,11 +150,42 @@ class ModelRunner:
                     day += 1
                     hour = 0
 
-        # Begin generating visualisations
-        df_results.to_csv('results.csv')
-
+        # Metrics Calculation
         feature_sets = df_results['Feature Set'].unique()
+        models = df_results['Model'].unique()
+        optimiser = df_results['Optimiser'].unique()
 
+        for feature_set in feature_sets:
+            for model in models:
+                for optimiser in optimiser:
+                    df_relevant_records = df_results.loc[
+                        (df_results['Model'] == model) & (df_results['Optimiser'] == optimiser) & (df_results['Feature Set'] == feature_set)
+                    ]
+
+                    y_test = df_relevant_records['Original'].values
+                    y_predicted = df_relevant_records['Predicted'].values
+
+                    mse = mean_squared_error(y_test, y_predicted)
+                    mae = mean_absolute_error(y_test, y_predicted)
+                    rmse = np.sqrt(mse)
+                    r2 = r2_score(y_test, y_predicted)
+
+                    df_row_results = pd.DataFrame([{
+                        'Model': model,
+                        'Optimiser': optimiser,
+
+                        'Feature Set': feature_set,
+                        'MSE': mse,
+                        'MAE': mae,
+                        'RMSE': rmse,
+                        'R2': r2
+                    }])
+
+                    df_metrics = pd.concat([df_metrics, df_row_results], ignore_index=True)
+
+        df_metrics.to_csv('metrics.csv')
+
+        # Begin generating visualisations
         for feature_set in feature_sets:
             grid = sns.relplot(
                 data=df_results.loc[df_results['Feature Set'] == feature_set], x='Original', y='Predicted',
