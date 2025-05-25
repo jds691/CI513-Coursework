@@ -153,11 +153,11 @@ class ModelRunner:
         # Metrics Calculation
         feature_sets = df_results['Feature Set'].unique()
         models = df_results['Model'].unique()
-        optimiser = df_results['Optimiser'].unique()
+        optimisers = df_results['Optimiser'].unique()
 
         for feature_set in feature_sets:
             for model in models:
-                for optimiser in optimiser:
+                for optimiser in optimisers:
                     df_relevant_records = df_results.loc[
                         (df_results['Model'] == model) & (df_results['Optimiser'] == optimiser) & (df_results['Feature Set'] == feature_set)
                     ]
@@ -165,10 +165,25 @@ class ModelRunner:
                     y_test = df_relevant_records['Original'].values
                     y_predicted = df_relevant_records['Predicted'].values
 
-                    mse = mean_squared_error(y_test, y_predicted)
-                    mae = mean_absolute_error(y_test, y_predicted)
-                    rmse = np.sqrt(mse)
-                    r2 = r2_score(y_test, y_predicted)
+                    try:
+                        mse = mean_squared_error(y_test, y_predicted)
+                    except ValueError:
+                        mse = np.nan
+
+                    try:
+                        mae = mean_absolute_error(y_test, y_predicted)
+                    except ValueError:
+                        mae = np.nan
+
+                    try:
+                        rmse = np.sqrt(mse)
+                    except ValueError:
+                        rmse = np.nan
+
+                    try:
+                        r2 = r2_score(y_test, y_predicted)
+                    except ValueError:
+                        r2 = np.nan
 
                     df_row_results = pd.DataFrame([{
                         'Model': model,
