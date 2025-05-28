@@ -2,7 +2,6 @@ from typing import Any
 
 from keras.src.layers import Bidirectional
 from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
-from sklearn.multioutput import MultiOutputRegressor
 from sklearn.tree import DecisionTreeRegressor
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM
